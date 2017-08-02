@@ -1,54 +1,77 @@
 --non_usa_customers.sql: Provide a query showing Customers (just their full names, customer ID and country) who are not in the US.
-select c.FirstName as "First Name", c.LastName as "Last Name", c.CustomerId as "Customer ID", c.Country as "Country"
+select c.FirstName || ' ' ||  c.LastName as "Full Name", c.CustomerId, c.Country
 from Customer c
 where c.Country != "USA"
+;
 
 --brazil_customers.sql: Provide a query only showing the Customers from Brazil.
-select c.FirstName as "First Name", c.LastName as "Last Name", c.CustomerId as "Customer ID", c.Country as "Country"
-from Customer c
-where c.Country = "Brazil"
+select * from Customer where Country = "Brazil"
+;
 
 --brazil_customers_invoices.sql: Provide a query showing the Invoices of customers who are from Brazil. 
 --The resultant table should show the customer's full name, Invoice ID, Date of the invoice and billing country.
-select c.FirstName as "First Name", c.LastName as "Last Name",  i.InvoiceId as "Invoice ID", i.InvoiceDate as "Invoice Date", i.BillingCountry as "Billing Country"
+select c.FirstName || ' ' ||  c.LastName as "Full Name",  i.InvoiceId, i.InvoiceDate, i.BillingCountry
 from Customer c, Invoice i
-where i.BillingCountry = "Brazil"
+where i.CustomerId = c.CustomerId
+and  c.Country = "Brazil"
+;
 
 --sales_agents.sql: Provide a query showing only the Employees who are Sales Agents.
-select e.FirstName as "First Name", e.LastName as "Last Name", e.EmployeeId as "Employee ID", e.Title as "Title"
-from Employee e
-where e.Title = "Sales Support Agent"
+select * from Employee where Title = "Sales Support Agent"
+;
 
 --unique_invoice_countries.sql: Provide a query showing a unique/distinct list of billing countries from the Invoice table.
-select i.BillingCountry as "Billing Countries"
-from Invoice i
-group by i.BillingCountry
+select distinct i.BillingCountry from Invoice i
+;
 
 --sales_agent_invoices.sql: Provide a query that shows the invoices associated with each sales agent. 
 --The resultant table should include the Sales Agent's full name.
-select e.FirstName as "First Name", e.LastName as "Last Name", i.InvoiceId as "Invoice ID"
-from Employee e, Invoice i
-where e.Title = "Sales Support Agent"
+select e.FirstName || ' ' || e.LastName as "Employee Name",
+			i.InvoiceId,
+			i.InvoiceDate,
+			i.BillingCountry,
+			i.Total
+from Employee e, Invoice i, Customer c
+where e.EmployeeId = c.SupportRepId
+and i.CustomerId = c.CustomerId
 group by e.LastName
+;
 
 --invoice_totals.sql: Provide a query that shows the Invoice Total, Customer name, Country and Sale Agent name for all invoices and customers.
-select '$' + i.Total as "Invoice Total", c.FirstName as "Customer First Name", c.LastName as "Customer Last Name", c.Country as "Country", e.FirstName as "Employee First Name", e.LastName as "Employee Last Name"
-from Employee e, Invoice i, Customer c
+select i.Total as "Invoice Total", 
+			c.FirstName ||' '|| c.LastName as "Customer Name", 
+			c.Country, 
+			e.FirstName ||' '|| e.LastName as "Sale Agent"
+from Invoice i, Customer c, Employee e
+where c.CustomerId = i.CustomerId
+and c.SupportRepId = e.EmployeeId
+order by c.LastName
+;
 
---total_invoices_{year}.sql: How many Invoices were there in 2009?
-select count (i.InvoiceId) as "Total Number of Invoices in 2009"
+--total_invoices_{year}.sql: How many Invoices were there in 2009 and 2011?
+select count (i.InvoiceId) NumberOfInvoices,
+			strftime('%Y', i.InvoiceDate) as InvoiceYear
 from Invoice i
-where i.InvoiceDate LIKE "2009%"
-
---and 2011?
-select count (i.InvoiceId) as "Total Number of Invoices in 2011"
-from Invoice i
-where i.InvoiceDate LIKE "2011%"
+where InvoiceYear = '2011'
+or InvoiceYear = '2009'
+group by InvoiceYear
+;
 
 --total_sales_{year}.sql: What are the respective total sales for each of those years?
-
+--for 2009 or 2011
+select '$' || sum (i.Total) Total,
+			strftime ('%Y', i.InvoiceDate) as InvoiceYear
+from Invoice i
+where InvoiceYear = '2011'
+or InvoiceYear = '2009'
+group by InvoiceYear
+;
 
 --invoice_37_line_item_count.sql: Looking at the InvoiceLine table, provide a query that COUNTs the number of line items for Invoice ID 37.
+select count (*) as "Line Items for Invoice ID 37"
+from InvoiceLine
+where InvoiceId = 37
+;
 
 --line_items_per_invoice.sql: Looking at the InvoiceLine table, provide a query that COUNTs the number of line items for each Invoice. HINT: GROUP BY
 
@@ -68,10 +91,19 @@ where i.InvoiceDate LIKE "2011%"
 
 --top_2009_agent.sql: Which sales agent made the most in sales in 2009?
 --Hint: Use the MAX function on a subquery.
-
+select
+	max (Sales.TotalSales) as TopSales
+;
+	
 --top_agent.sql: Which sales agent made the most in sales over all?
 
 --sales_agent_customer_count.sql: Provide a query that shows the count of customers assigned to each sales agent.
+select e.FirstName || ' ' || e.LastName as EmployeeName,
+			count (c.CustomerId)
+from Employee e
+join Customer c on c.SupportRepId = e.EmployeeId
+group by EmployeeName
+;
 
 --sales_per_country.sql: Provide a query that shows the total sales per country.
 
@@ -80,7 +112,15 @@ where i.InvoiceDate LIKE "2011%"
 --top_2013_track.sql: Provide a query that shows the most purchased track of 2013.
 
 --top_5_tracks.sql: Provide a query that shows the top 5 most purchased tracks over all.
+select t.Name, count (t.Name) PurchaseCount
+from Track t
+join InvoiceLine 1 on 1.TrackId = t.trackId
+group by t.Name
+order by PurchaseCount desc
+limit 5
+;
 
 --top_3_artists.sql: Provide a query that shows the top 3 best selling artists.
+
 
 --top_media_type.sql: Provide a query that shows the most purchased Media Type.

@@ -1,5 +1,8 @@
 --total_invoices_{year}.sql: How many Invoices were there in 2009 and 2011?
-select i.Total as "Invoice Total", i.InvoiceDate as "Invoice Date"
+select count (i.InvoiceId) NumberOfInvoices,
+			strftime('%Y', i.InvoiceDate) as InvoiceYear
 from Invoice i
-where i.InvoiceDate LIKE "2009%"
-or i.InvoiceDate LIKE "2011%"
+where InvoiceYear = '2011'
+or InvoiceYear = '2009'
+group by InvoiceYear
+;
