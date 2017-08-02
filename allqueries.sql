@@ -31,14 +31,22 @@ from Employee e, Invoice i
 where e.Title = "Sales Support Agent"
 group by e.LastName
 
-
-
-
 --invoice_totals.sql: Provide a query that shows the Invoice Total, Customer name, Country and Sale Agent name for all invoices and customers.
+select '$' + i.Total as "Invoice Total", c.FirstName as "Customer First Name", c.LastName as "Customer Last Name", c.Country as "Country", e.FirstName as "Employee First Name", e.LastName as "Employee Last Name"
+from Employee e, Invoice i, Customer c
 
---total_invoices_{year}.sql: How many Invoices were there in 2009 and 2011?
+--total_invoices_{year}.sql: How many Invoices were there in 2009?
+select count (i.InvoiceId) as "Total Number of Invoices in 2009"
+from Invoice i
+where i.InvoiceDate LIKE "2009%"
+
+--and 2011?
+select count (i.InvoiceId) as "Total Number of Invoices in 2011"
+from Invoice i
+where i.InvoiceDate LIKE "2011%"
 
 --total_sales_{year}.sql: What are the respective total sales for each of those years?
+
 
 --invoice_37_line_item_count.sql: Looking at the InvoiceLine table, provide a query that COUNTs the number of line items for Invoice ID 37.
 
