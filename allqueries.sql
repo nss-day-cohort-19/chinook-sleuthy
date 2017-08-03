@@ -74,12 +74,30 @@ where InvoiceId = 37
 ;
 
 --line_items_per_invoice.sql: Looking at the InvoiceLine table, provide a query that COUNTs the number of line items for each Invoice. HINT: GROUP BY
+select count (il.InvoiceId) as "Number of Line Items"
+from InvoiceLine il, Invoice i
+where il.InvoiceId = i.InvoiceId
+group by i.InvoiceId
+;
 
 --line_item_track.sql: Provide a query that includes the purchased track name with each invoice line item.
+select t.Name, il.InvoiceLineId
+from Track t, InvoiceLine il
+where t.TrackId = il.TrackId
+;
 
 --line_item_track_artist.sql: Provide a query that includes the purchased track name AND artist name with each invoice line item.
+select t.Name, t.Composer, il.InvoiceLineId
+from Track t, InvoiceLine il
+where t.TrackId = il.TrackId
+;
 
 --country_invoices.sql: Provide a query that shows the # of invoices per country. HINT: GROUP BY
+select count (*) as "Number of Invoices",
+			BillingCountry as "Country"
+from Invoice
+group by BillingCountry
+;
 
 --playlists_track_count.sql: Provide a query that shows the total number of tracks in each playlist. The Playlist name should be include on the resulant table.
 
