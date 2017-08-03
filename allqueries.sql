@@ -100,8 +100,17 @@ group by BillingCountry
 ;
 
 --playlists_track_count.sql: Provide a query that shows the total number of tracks in each playlist. The Playlist name should be include on the resulant table.
+select p.Name as "Playlist Name",
+			count (pt.TrackId) as "Number of Tracks"
+from Playlist p, PlaylistTrack pt
+where p.PlaylistId = pt.PlaylistId
+group by p.Name
+;
 
 --tracks_no_id.sql: Provide a query that shows all the Tracks, but displays no IDs. The result should include the Album name, Media type and Genre.
+select t.Name, t.AlbumId, t.MediaTypeId, t.GenreId, t.Composer, t.Milliseconds, t.Bytes, t.UnitPrice
+from Track t
+;
 
 --invoices_line_item_count.sql: Provide a query that shows all Invoices but includes the # of invoice line items.
 
@@ -110,7 +119,7 @@ group by BillingCountry
 --top_2009_agent.sql: Which sales agent made the most in sales in 2009?
 --Hint: Use the MAX function on a subquery.
 select
-	max (Sales.TotalSales) as TopSales
+	max (Sales.TotalSales) as "TopSales"
 ;
 	
 --top_agent.sql: Which sales agent made the most in sales over all?
